@@ -1,18 +1,20 @@
+<img src="https://raw.githubusercontent.com/skylot/jadx/master/jadx-gui/src/main/resources/logos/jadx-logo.png" width="64" align="left" />
+
 ## JADX
 
-[![Build Status](https://travis-ci.org/skylot/jadx.png?branch=master)](https://travis-ci.org/skylot/jadx)
-[![Code Coverage](https://codecov.io/gh/skylot/jadx/branch/master/graph/badge.svg)](https://codecov.io/gh/skylot/jadx)
+[![Build status](https://github.com/skylot/jadx/workflows/Build/badge.svg)](https://github.com/skylot/jadx/actions?query=workflow%3ABuild)
 [![Alerts from lgtm.com](https://img.shields.io/lgtm/alerts/g/skylot/jadx.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/skylot/jadx/alerts/)
-[![SonarQube Bugs](https://sonarcloud.io/api/project_badges/measure?project=jadx&metric=bugs)](https://sonarcloud.io/dashboard?id=jadx)
-[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 **jadx** - Dex to Java decompiler
 
-Command line and GUI tools for produce Java source code from Android Dex and Apk files
+Command line and GUI tools for producing Java source code from Android Dex and Apk files
+
+:exclamation: :exclamation: :exclamation: Please note that in most cases Jadx can't decompile all 100% of the code, so errors will occur. Check [Troubleshooting guide](https://github.com/skylot/jadx/wiki/Troubleshooting-Q&A#decompilation-issues) for workarounds
 
 **Main features:**
-- decompile Dalvik bytecode to java classes from APK, dex, aar and zip files
+- decompile Dalvik bytecode to java classes from APK, dex, aar, aab and zip files
 - decode `AndroidManifest.xml` and other resources from `resources.arsc`
 - deobfuscator included
 
@@ -21,25 +23,23 @@ Command line and GUI tools for produce Java source code from Android Dex and Apk
 - jump to declaration
 - find usage
 - full text search
+- smali debugger (thanks to [@LBJ-the-GOAT](https://github.com/LBJ-the-GOAT)), check [wiki page](https://github.com/skylot/jadx/wiki/Smali-debugger) for setup and usage
 
 See these features in action here: [jadx-gui features overview](https://github.com/skylot/jadx/wiki/jadx-gui-features-overview)
 
-
-![jadx-gui screenshot](https://i.imgur.com/h917IBZ.png)
-
+<img src="https://user-images.githubusercontent.com/118523/142730720-839f017e-38db-423e-b53f-39f5f0a0316f.png" width="700"/>
 
 ### Download
-- latest [unstable build: ![Download](https://api.bintray.com/packages/skylot/jadx/unstable/images/download.svg) ](https://bintray.com/skylot/jadx/unstable/_latestVersion#files)
 - release from [github: ![Latest release](https://img.shields.io/github/release/skylot/jadx.svg)](https://github.com/skylot/jadx/releases/latest)
-- release from [bintray: ![Download](https://api.bintray.com/packages/skylot/jadx/releases/images/download.svg) ](https://bintray.com/skylot/jadx/releases/_latestVersion#files)
+- latest [unstable build](https://nightly.link/skylot/jadx/workflows/build/master)
 
 After download unpack zip file go to `bin` directory and run:
 - `jadx` - command line version
 - `jadx-gui` - UI version
 
 On Windows run `.bat` files with double-click\
-**Note:** ensure you have installed Java 8 or later 64-bit version.
-For windows you can download it from [adoptopenjdk.net](https://adoptopenjdk.net/releases.html?variant=openjdk11&jvmVariant=hotspot#x64_win) (select "Install JRE").
+**Note:** ensure you have installed Java 11 or later 64-bit version.
+For windows you can download it from [oracle.com](https://www.oracle.com/java/technologies/downloads/#jdk17-windows) (select x64 Installer).
 
 ### Install
 1. Arch linux
@@ -50,6 +50,9 @@ For windows you can download it from [adoptopenjdk.net](https://adoptopenjdk.net
     ```bash
         brew install jadx
     ```
+
+### Use jadx as a library
+You can use jadx in your java projects, check details on [wiki page](https://github.com/skylot/jadx/wiki/Use-jadx-as-a-library)
 
 ### Build from source
 JDK 8 or higher must be installed:
@@ -66,7 +69,7 @@ and also packed to `build/jadx-<version>.zip`
 
 ### Usage
 ```
-jadx[-gui] [options] <input file> (.apk, .dex, .jar, .class, .smali, .zip, .aar, .arsc)
+jadx[-gui] [options] <input files> (.apk, .dex, .jar, .class, .smali, .zip, .aar, .arsc, .aab)
 options:
   -d, --output-dir                    - output directory
   -ds, --output-dir-src               - output directory for sources
@@ -80,30 +83,42 @@ options:
   --show-bad-code                     - show inconsistent code (incorrectly decompiled)
   --no-imports                        - disable use of imports, always write entire package name
   --no-debug-info                     - disable debug info
+  --add-debug-lines                   - add comments with debug line numbers if available
   --no-inline-anonymous               - disable anonymous classes inline
+  --no-inline-methods                 - disable methods inline
   --no-replace-consts                 - don't replace constant value with matching constant field
   --escape-unicode                    - escape non latin characters in strings (with \u)
   --respect-bytecode-access-modifiers - don't change original access modifiers
   --deobf                             - activate deobfuscation
   --deobf-min                         - min length of name, renamed if shorter, default: 3
   --deobf-max                         - max length of name, renamed if longer, default: 64
-  --deobf-rewrite-cfg                 - force to save deobfuscation map
+  --deobf-cfg-file                    - deobfuscation map file, default: same dir and name as input file with '.jobf' extension
+  --deobf-rewrite-cfg                 - force to ignore and overwrite deobfuscation map file
   --deobf-use-sourcename              - use source file name as class name alias
-  --rename-flags                      - what to rename, comma-separated, 'case' for system case sensitivity, 'valid' for java identifiers, 'printable' characters, 'none' or 'all' (default)
+  --deobf-parse-kotlin-metadata       - parse kotlin metadata to class and package names
+  --use-kotlin-methods-for-var-names  - use kotlin intrinsic methods to rename variables, values: disable, apply, apply-and-hide, default: apply
+  --rename-flags                      - fix options (comma-separated list of):
+                                         'case' - fix case sensitivity issues (according to --fs-case-sensitive option),
+                                         'valid' - rename java identifiers to make them valid,
+                                         'printable' - remove non-printable chars from identifiers,
+                                        or single 'none' - to disable all renames
+                                        or single 'all' - to enable all (default)
   --fs-case-sensitive                 - treat filesystem as case sensitive, false by default
   --cfg                               - save methods control flow graph to dot file
   --raw-cfg                           - save methods control flow graph (use raw instructions)
   -f, --fallback                      - make simple dump (using goto instead of 'if', 'for', etc)
+  --use-dx                            - use dx/d8 to convert java bytecode
+  --comments-level                    - set code comments level, values: error, warn, info, debug, user-only, none, default: info
+  --log-level                         - set log level, values: quiet, progress, error, warn, info, debug, default: progress
   -v, --verbose                       - verbose output (set --log-level to DEBUG)
   -q, --quiet                         - turn off output (set --log-level to QUIET)
-  --log-level                         - set log level, values: QUIET, PROGRESS, ERROR, WARN, INFO, DEBUG, default: PROGRESS
   --version                           - print jadx version
   -h, --help                          - print this help
-Example:
- jadx -d out classes.dex
- jadx --rename-flags "none" classes.dex
- jadx --rename-flags "valid,printable" classes.dex
- jadx --log-level error app.apk
+Examples:
+  jadx -d out classes.dex
+  jadx --rename-flags "none" classes.dex
+  jadx --rename-flags "valid, printable" classes.dex
+  jadx --log-level ERROR app.apk
 ```
 These options also worked on jadx-gui running from command line and override options from preferences dialog
 
@@ -116,10 +131,5 @@ To support this project you can:
   - Submit decompilation issues, please read before proceed: [Open issue](CONTRIBUTING.md#Open-Issue)
   - Open pull request, please follow these rules: [Pull Request Process](CONTRIBUTING.md#Pull-Request-Process)
 
-### Related projects:
-- [PyJadx](https://github.com/romainthomas/pyjadx) - python binding for jadx by [@romainthomas](https://github.com/romainthomas)
-
 ---------------------------------------
 *Licensed under the Apache 2.0 License*
-
-*Copyright 2019 by Skylot*
