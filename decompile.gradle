@@ -173,7 +173,7 @@ task decompileDex(type: Delete) {
                 executable "java"
                 argv = []
                 argv << '-jar'
-                argv << "$rootDir/tools/smali/lib/baksmali-2.3.4.jar"
+                argv << "$rootDir/tools/smali/lib/baksmali-2.5.2.jar"
                 argv << 'd'
                 argv << "$rootDir/temp/dex/" + list[i]
                 args = argv
